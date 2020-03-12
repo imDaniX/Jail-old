@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -159,7 +158,7 @@ public class JailTransferCommand implements Command {
                 else if(previous.equalsIgnoreCase("-c")) {
                     //Since we need to give them a list of the cells in a jail
                     //we need to get the jail they're giving
-                    int jailIndex = ArrayUtils.indexOf(args, "-j");
+                    int jailIndex = Arrays.asList(args).indexOf("-j");
                     if(jailIndex != -1) {
                         String jail = args[jailIndex + 1];
                         jm.getPlugin().debug("The jail is: " + jail);

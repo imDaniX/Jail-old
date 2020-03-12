@@ -36,6 +36,7 @@ public class PrisonerTimeChangeEvent extends Event implements Cancellable {
      * @param after the time after it changed
      */
     public PrisonerTimeChangeEvent(Jail jail, Cell cell, Prisoner prisoner, Player player, long before, long after) {
+        super(true);
         this.jail = jail;
         this.cell = cell;
         this.prisoner = prisoner;

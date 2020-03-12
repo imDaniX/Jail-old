@@ -45,3 +45,14 @@ src/com/matejdro/
 /dependency-reduced-pom.xml
 /global.yml
 /data.yml
+
+# Intellij
+.idea/modules.xml
+.idea/*.iml
+.idea/modules
+.idea/**/libraries
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf

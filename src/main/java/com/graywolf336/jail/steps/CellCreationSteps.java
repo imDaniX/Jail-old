@@ -3,6 +3,7 @@ package com.graywolf336.jail.steps;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
@@ -93,7 +94,7 @@ public class CellCreationSteps {
 
     /** Applies the second step, which is adding signs to the cell. */
     private void secondStep(CreationPlayer cp, Player player, Block block) {
-        if (block.getType() == Material.SIGN || block.getType() == Material.WALL_SIGN) {
+        if (block.getState() instanceof Sign) {
             cp.addSign(new SimpleLocation(block.getLocation()));
 
             //Set the sign's first text

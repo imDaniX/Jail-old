@@ -5,25 +5,14 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.graywolf336</groupId>
 	<artifactId>Jail</artifactId>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>3.1.1-SNAPSHOT</version>
 	<name>Jail</name>
 	<description>Ban too harsh? Mute too weak? Kicking not enough? Jail them!</description>
-	<url>http://dev.bukkit.org/bukkit-plugins/jail/</url>
-
-	<ciManagement>
-		<url>https://ci.craftyn.com/job/Jail/</url>
-		<system>jenkins</system>
-	</ciManagement>
-
-	<issueManagement>
-		<url>https://github.com/graywolf336/Jail/issues</url>
-		<system>GitHub</system>
-	</issueManagement>
 
 	<scm>
-		<url>https://github.com/graywolf336/Jail</url>
-		<connection>scm:git:git://github.com/graywolf336/Jail.git</connection>
-		<developerConnection>scm:git:git:@github.com/graywolf336/Jail.git</developerConnection>
+		<url>https://github.com/budi1200/Jail</url>
+		<connection>scm:git:git://github.com/budi1200/Jail.git</connection>
+		<developerConnection>scm:git:git:@github.com/budi1200/Jail.git</developerConnection>
 	</scm>
 
 	<properties>
@@ -34,12 +23,7 @@
 	<repositories>
 		<repository>
 			<id>vault-repo</id>
-			<url>http://nexus.hc.to/content/repositories/pub_releases/</url>
-		</repository>
-
-		<repository>
-			<id>spigot-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+			<url>https://ci.ender.zone/plugin/repository/everything/net/milkbowl/vault/</url>
 		</repository>
 
 		<repository>
@@ -48,25 +32,25 @@
 		</repository>
 
 		<repository>
-			<id>gray-snapshot</id>
-			<url>https://repo.craftyn.com/repository/graywolf336-snapshots/</url>
+			<id>spigot-repo</id>
+			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
 	</repositories>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>bukkit</artifactId>
-			<version>1.13.2-R0.1-SNAPSHOT</version>
-			<type>jar</type>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-api</artifactId>
+			<version>1.15.1-R0.1-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>1.13.2-R0.1-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>provided</scope>
+			<version>1.15.2</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/spigot-1.15.2.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -79,8 +63,8 @@
 
 		<dependency>
 			<groupId>net.milkbowl.vault</groupId>
-			<artifactId>Vault</artifactId>
-			<version>1.5.6</version>
+			<artifactId>VaultAPI</artifactId>
+			<version>1.7</version>
 			<type>jar</type>
 			<scope>provided</scope>
 			<optional>true</optional>
@@ -96,30 +80,30 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<version>4.13</version>
 		</dependency>
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-module-junit4</artifactId>
-			<version>1.5.5</version>
+			<version>2.0.5</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-easymock</artifactId>
-			<version>1.5.5</version>
+			<version>2.0.5</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-mockito</artifactId>
-			<version>1.5.5</version>
+			<version>1.7.4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
-			<version>3.2</version>
+			<version>4.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -319,17 +303,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<distributionManagement>
-		<repository>
-			<id>repo-release</id>
-			<name>Jail Releases</name>
-			<url>https://repo.craftyn.com/repository/internal/</url>
-		</repository>
-		<snapshotRepository>
-			<id>repo-snapshot</id>
-			<name>Jail Snapshots</name>
-			<url>https://repo.craftyn.com/repository/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
 </project>

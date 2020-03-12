@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -28,6 +26,8 @@ import com.graywolf336.jail.events.PrePrisonerJailedEvent;
 import com.graywolf336.jail.interfaces.ICell;
 import com.lexicalscope.jewel.cli.ArgumentValidationException;
 import com.lexicalscope.jewel.cli.CliFactory;
+
+import static org.bukkit.Bukkit.getLogger;
 
 @CommandInfo(
         maxArgs = -1,
@@ -285,7 +285,7 @@ public class JailCommand implements Command {
                 else if(previous.equalsIgnoreCase("-c")) {
                     //Since we need to give them a list of the cells in a jail
                     //we need to get the jail they're giving
-                    int jailIndex = ArrayUtils.indexOf(args, "-j");
+                    int jailIndex = Arrays.asList(args).indexOf("-j");
                     if(jailIndex != -1) {
                         String jail = args[jailIndex + 1];
                         jm.getPlugin().debug("The jail is: " + jail);
