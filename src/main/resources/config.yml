@@ -24,6 +24,7 @@ jailing:
     blockPlacePenalty: 5m
     blockPlaceProtection: true
     blockPlaceWhiteList: ['wheat', 'carrot', 'potato'] # these blocks can be placed at any time by prisoners
+    blockBreakLogTimeReduction: 1m
     cellsign:
     - '%player%'
     - '%prettytime%'

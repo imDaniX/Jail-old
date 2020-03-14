@@ -24,67 +24,84 @@ public class ProtectionListener implements Listener {
         this.pl = plugin;
     }
 
-    @EventHandler(ignoreCancelled=true, priority = EventPriority.LOW)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void protectionBlockBreaking(BlockBreakEvent event) {
         //Before we check if the player is jailed, let's save a
         //tiny bit of resources and check if this protection is enabled
-        if(pl.getConfig().getBoolean(Settings.BLOCKBREAKPROTECTION.getPath())) {
+        if (pl.getConfig().getBoolean(Settings.BLOCKBREAKPROTECTION.getPath())) {
             //Let's check if the player is jailed
-            if(pl.getJailManager().isPlayerJailed(event.getPlayer().getUniqueId())) {
+            if (pl.getJailManager().isPlayerJailed(event.getPlayer().getUniqueId())) {
                 //Get the breaking whitelist, check if the current item is in there
-                if(!Util.isStringInsideList(event.getBlock().getType().toString().toLowerCase(),
+                boolean didBreakLog = event.getBlock().getType().toString().contains("_LOG");
+                // TODO: Add option to enable in config
+                if (didBreakLog) {
+                    String msg = "";
+
+                    try {
+                        long subtract = Util.getTime(pl.getConfig().getString(Settings.BLOCKBREAKLOGTIMEREDUCTION.getPath()));
+                        pl.getJailManager().getPrisoner(event.getPlayer().getUniqueId()).subtractTime(subtract);
+
+                        msg = Lang.CHOPLOGSUCCESS.get(String.valueOf(TimeUnit.MINUTES.convert(subtract, TimeUnit.MILLISECONDS)), Lang.CHOPLOGSUCCESS.get());
+
+                        event.getPlayer().sendMessage(msg);
+                    } catch (Exception err) {
+                        pl.getLogger().severe("Block break penalty's time is in the wrong format, please fix.");
+                    }
+
+                } else if (!Util.isStringInsideList(event.getBlock().getType().toString().toLowerCase(),
                         pl.getConfig().getStringList(Settings.BLOCKBREAKWHITELIST.getPath()))) {
                     //As our Util.getTime throws an exception when the time is in an
                     //incorrect format, we catch the exception and don't add any time
                     //as a fail safe, don't want us to go crazy adding tons of time.
                     try {
+                        String msg = "";
+
                         long add = Util.getTime(pl.getConfig().getString(Settings.BLOCKBREAKPENALTY.getPath()));
                         pl.getJailManager().getPrisoner(event.getPlayer().getUniqueId()).addTime(add);
 
-                        String msg = "";
-                        if(add == 0L) {
+                        if (add == 0L) {
                             //Generate the protection message, provide the method with one argument
                             //which is the thing we are protecting against
                             msg = Lang.PROTECTIONMESSAGENOPENALTY.get(Lang.BLOCKBREAKING.get());
-                        }else {
+                        } else {
                             //Generate the protection message, provide the method with two arguments
                             //First is the time in minutes and second is the thing we are protecting against
-                            msg = Lang.PROTECTIONMESSAGE.get(new String[] { String.valueOf(TimeUnit.MINUTES.convert(add, TimeUnit.MILLISECONDS)), Lang.BLOCKBREAKING.get() });
+                            msg = Lang.PROTECTIONMESSAGE.get(String.valueOf(TimeUnit.MINUTES.convert(add, TimeUnit.MILLISECONDS)), Lang.BLOCKBREAKING.get());
                         }
 
                         //Send the message
                         event.getPlayer().sendMessage(msg);
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         pl.getLogger().severe("Block break penalty's time is in the wrong format, please fix.");
                     }
 
                     //Stop the event from happening, as the block wasn't in the whitelist
-                    event.setCancelled(true);
+                    event.setCancelled(!didBreakLog);
                 }
-            }else {
-            	//The player is not jailed but they're trying to break blocks inside of the Jail
+            } else {
+                //The player is not jailed but they're trying to break blocks inside of the Jail
                 //If there is no jail let's skedaddle
-                if(pl.getJailManager().getJailFromLocation(event.getBlock().getLocation()) == null) return;
+                if (pl.getJailManager().getJailFromLocation(event.getBlock().getLocation()) == null) return;
 
                 //If the player doesn't have permission to modify the jail,
                 //then we stop it here. We won't be doing any of the additions to
                 //a prisoner's sentence here as that's for the protections listener
-                if(!event.getPlayer().hasPermission("jail.modifyjail")) {
+                if (!event.getPlayer().hasPermission("jail.modifyjail")) {
                     event.setCancelled(true);
                 }
             }
         }
     }
 
-    @EventHandler(ignoreCancelled=true, priority = EventPriority.LOW)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void protectionBlockPlacing(BlockPlaceEvent event) {
         //Before we check if the player is jailed, let's save a
         //tiny bit of resources and check if this protection is enabled
-        if(pl.getConfig().getBoolean(Settings.BLOCKPLACEPROTECTION.getPath())) {
+        if (pl.getConfig().getBoolean(Settings.BLOCKPLACEPROTECTION.getPath())) {
             //Let's check if the player is jailed
-            if(pl.getJailManager().isPlayerJailed(event.getPlayer().getUniqueId())) {
+            if (pl.getJailManager().isPlayerJailed(event.getPlayer().getUniqueId())) {
                 //Get the placing whitelist, check if the current item is in there
-                if(!Util.isStringInsideList(event.getBlock().getType().toString().toLowerCase(), 
+                if (!Util.isStringInsideList(event.getBlock().getType().toString().toLowerCase(),
                         pl.getConfig().getStringList(Settings.BLOCKPLACEWHITELIST.getPath()))) {
                     //As our Util.getTime throws an exception when the time is in an
                     //incorrect format, we catch the exception and don't add any time
@@ -94,74 +111,74 @@ public class ProtectionListener implements Listener {
                         pl.getJailManager().getPrisoner(event.getPlayer().getUniqueId()).addTime(add);
 
                         String msg = "";
-                        if(add == 0L) {
+                        if (add == 0L) {
                             //Generate the protection message, provide the method with one argument
                             //which is the thing we are protecting against
                             msg = Lang.PROTECTIONMESSAGENOPENALTY.get(Lang.BLOCKPLACING);
-                        }else {
+                        } else {
                             //Generate the protection message, provide the method with two arguments
                             //First is the time in minutes and second is the thing we are protecting against
-                            msg = Lang.PROTECTIONMESSAGE.get(new String[] { String.valueOf(TimeUnit.MINUTES.convert(add, TimeUnit.MILLISECONDS)), Lang.BLOCKPLACING.get() });
+                            msg = Lang.PROTECTIONMESSAGE.get(new String[]{String.valueOf(TimeUnit.MINUTES.convert(add, TimeUnit.MILLISECONDS)), Lang.BLOCKPLACING.get()});
                         }
 
                         //Send the message
                         event.getPlayer().sendMessage(msg);
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         pl.getLogger().severe("Block place penalty's time is in the wrong format, please fix.");
                     }
 
                     //Stop the event from happening, as the block wasn't in the whitelist
                     event.setCancelled(true);
                 }
-            }else {
-            	//The player is not jailed but they're trying to place blocks inside of the Jail
+            } else {
+                //The player is not jailed but they're trying to place blocks inside of the Jail
                 //If there is no jail let's skedaddle
-                if(pl.getJailManager().getJailFromLocation(event.getBlock().getLocation()) == null) return;
+                if (pl.getJailManager().getJailFromLocation(event.getBlock().getLocation()) == null) return;
 
                 //If the player doesn't have permission to modify the jail,
                 //then we stop it here. We won't be doing any of the additions to
                 //a prisoner's sentence here as that's for the protections listener
-                if(!event.getPlayer().hasPermission("jail.modifyjail")) {
+                if (!event.getPlayer().hasPermission("jail.modifyjail")) {
                     event.setCancelled(true);
                 }
             }
         }
     }
 
-    @EventHandler(ignoreCancelled=true, priority = EventPriority.LOW)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void commandProtection(PlayerCommandPreprocessEvent event) {
         //Before we check if the player is jailed, let's save a
         //tiny bit of resources and check if this protection is enabled
-        if(pl.getConfig().getBoolean(Settings.COMMANDPROTECTION.getPath())) {
+        if (pl.getConfig().getBoolean(Settings.COMMANDPROTECTION.getPath())) {
             //Let's check if this player is jailed, if so then we continue
             //otherwise we don't care about commands in here
-            if(pl.getJailManager().isPlayerJailed(event.getPlayer().getUniqueId())) {
+            if (pl.getJailManager().isPlayerJailed(event.getPlayer().getUniqueId())) {
                 boolean match = false;
 
-                for(String whited : pl.getConfig().getStringList(Settings.COMMANDWHITELIST.getPath()))
-                    if(event.getMessage().toLowerCase().startsWith(whited.toLowerCase()))
+                for (String whited : pl.getConfig().getStringList(Settings.COMMANDWHITELIST.getPath()))
+                    if (event.getMessage().toLowerCase().startsWith(whited.toLowerCase()))
                         match = true;
 
                 //If no match found in the whitelist, then let's block this command.
-                if(!match) {
+                if (!match) {
                     try {
                         long add = Util.getTime(pl.getConfig().getString(Settings.COMMANDPENALTY.getPath()));
                         pl.getJailManager().getPrisoner(event.getPlayer().getUniqueId()).addTime(add);
 
                         String msg = "";
-                        if(add == 0L) {
+                        if (add == 0L) {
                             //Generate the protection message, provide the method with one argument
                             //which is the thing we are protecting against
                             msg = Lang.PROTECTIONMESSAGENOPENALTY.get(Lang.COMMAND);
-                        }else {
+                        } else {
                             //Generate the protection message, provide the method with two arguments
                             //First is the time in minutes and second is the thing we are protecting against
-                            msg = Lang.PROTECTIONMESSAGE.get(new String[] { String.valueOf(TimeUnit.MINUTES.convert(add, TimeUnit.MILLISECONDS)), Lang.COMMAND.get() });
+                            msg = Lang.PROTECTIONMESSAGE.get(new String[]{String.valueOf(TimeUnit.MINUTES.convert(add, TimeUnit.MILLISECONDS)), Lang.COMMAND.get()});
                         }
 
                         //Send the message
                         event.getPlayer().sendMessage(msg);
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         pl.getLogger().severe("Command Protection penalty's time is in the wrong format, please fix.");
                     }
 
@@ -172,17 +189,17 @@ public class ProtectionListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled=true, priority = EventPriority.LOW)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void chestProtection(PlayerInteractEvent event) {
         //First thing is first, let's be sure the player we're dealing with is in jail
-        if(pl.getJailManager().isPlayerJailed(event.getPlayer().getUniqueId())) {
+        if (pl.getJailManager().isPlayerJailed(event.getPlayer().getUniqueId())) {
             //Next, let's check if it is a chest and if they're in a cell
             //If they are in a cell and are opening a chest, then we check
             //the config to see if they can open the chests
-            if(event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.CHEST) {
+            if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.CHEST) {
                 //Let's get the cell the player is in, then check if it is null or not.
-                if(pl.getJailManager().getJailPlayerIsIn(event.getPlayer().getUniqueId()).isJailedInACell(event.getPlayer().getUniqueId())) {
-                    if(pl.getConfig().getBoolean(Settings.PRISONEROPENCHEST.getPath())) {
+                if (pl.getJailManager().getJailPlayerIsIn(event.getPlayer().getUniqueId()).isJailedInACell(event.getPlayer().getUniqueId())) {
+                    if (pl.getConfig().getBoolean(Settings.PRISONEROPENCHEST.getPath())) {
                         //The prisoner is in a cell, so let's check if it is a couple chest.
                         Material bpos1 = event.getClickedBlock().getLocation().add(-1, 0, 0).getBlock().getType();
                         Material bpos2 = event.getClickedBlock().getLocation().add(+1, 0, 0).getBlock().getType();
@@ -194,20 +211,21 @@ public class ProtectionListener implements Listener {
                         boolean pos3 = bpos3 == Material.CHEST || bpos3 == Material.TRAPPED_CHEST;
                         boolean pos4 = bpos4 == Material.CHEST || bpos4 == Material.TRAPPED_CHEST;
 
-                        if(pos1 || pos2 || pos3 || pos4) {
+                        if (pos1 || pos2 || pos3 || pos4) {
                             //it is a double chest, so they're free to go!
-                            if(pl.inDebug()) event.getPlayer().sendMessage("[Jail Debug]: You're opening up a double chest.");
-                        }else {
+                            if (pl.inDebug())
+                                event.getPlayer().sendMessage("[Jail Debug]: You're opening up a double chest.");
+                        } else {
                             //it is not a double chest, so we won't be allowing it.
                             event.setCancelled(true);
                             return;
                         }
-                    }else {
+                    } else {
                         //the config has opening chests disabled
                         event.setCancelled(true);
                         return;
                     }
-                }else {
+                } else {
                     //The prisoner is not in a cell, so let's not allow it. IF we get feedback from people who
                     //use the plugin, this might get removed or permission node might be added.
                     event.setCancelled(true);
@@ -217,32 +235,32 @@ public class ProtectionListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled=true, priority = EventPriority.LOWEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void cropTramplingProtection(PlayerInteractEvent event) {
         //First thing is first, let's be sure the player we're dealing with is in jail
-        if(pl.getJailManager().isPlayerJailed(event.getPlayer().getUniqueId())) {
+        if (pl.getJailManager().isPlayerJailed(event.getPlayer().getUniqueId())) {
             //Next, check if crap trampling protection is enabled
-            if(pl.getConfig().getBoolean(Settings.CROPTRAMPLINGPROTECTION.getPath())) {
-                if(event.getAction() == Action.PHYSICAL && event.getClickedBlock().getType() == Material.FARMLAND) {
-                    if(pl.getJailManager().getJailFromLocation(event.getClickedBlock().getLocation()) != null) {
+            if (pl.getConfig().getBoolean(Settings.CROPTRAMPLINGPROTECTION.getPath())) {
+                if (event.getAction() == Action.PHYSICAL && event.getClickedBlock().getType() == Material.FARMLAND) {
+                    if (pl.getJailManager().getJailFromLocation(event.getClickedBlock().getLocation()) != null) {
                         try {
                             long add = Util.getTime(pl.getConfig().getString(Settings.CROPTRAMPLINGPENALTY.getPath()));
                             pl.getJailManager().getPrisoner(event.getPlayer().getUniqueId()).addTime(add);
 
                             String msg = "";
-                            if(add == 0L) {
+                            if (add == 0L) {
                                 //Generate the protection message, provide the method with one argument
                                 //which is the thing we are protecting against
                                 msg = Lang.PROTECTIONMESSAGENOPENALTY.get(Lang.CROPTRAMPLING);
-                            }else {
+                            } else {
                                 //Generate the protection message, provide the method with two arguments
                                 //First is the time in minutes and second is the thing we are protecting against
-                                msg = Lang.PROTECTIONMESSAGE.get(new String[] { String.valueOf(TimeUnit.MINUTES.convert(add, TimeUnit.MILLISECONDS)), Lang.CROPTRAMPLING.get() });
+                                msg = Lang.PROTECTIONMESSAGE.get(new String[]{String.valueOf(TimeUnit.MINUTES.convert(add, TimeUnit.MILLISECONDS)), Lang.CROPTRAMPLING.get()});
                             }
 
                             //Send the message
                             event.getPlayer().sendMessage(msg);
-                        }catch (Exception e) {
+                        } catch (Exception e) {
                             pl.getLogger().severe("Crop Trampling penalty's time is in the wrong format, please fix.");
                         }
 
@@ -253,66 +271,66 @@ public class ProtectionListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled=true)
+    @EventHandler(ignoreCancelled = true)
     public void interactionProtection(PlayerInteractEvent event) {
         //As the old version didn't do anything with Physical interactions, we won't either
         if (event.getAction() != Action.PHYSICAL) {
             //First thing is first, let's be sure the player we're dealing with is in jail
-            if(pl.getJailManager().isPlayerJailed(event.getPlayer().getUniqueId())) {
+            if (pl.getJailManager().isPlayerJailed(event.getPlayer().getUniqueId())) {
 
                 //Let's check if they've interacted with a block
                 if (event.getClickedBlock() != null) {
                     //Get the interaction blacklist, check if the current block is in there
                     //if it is, then let's take action
-                    if(Util.isStringInsideList(event.getClickedBlock().getType().toString().toLowerCase(),
+                    if (Util.isStringInsideList(event.getClickedBlock().getType().toString().toLowerCase(),
                             pl.getConfig().getStringList(Settings.PREVENTINTERACTIONBLOCKS.getPath()))) {
                         try {
                             long add = Util.getTime(pl.getConfig().getString(Settings.PREVENTINTERACTIONBLOCKSPENALTY.getPath()));
                             pl.getJailManager().getPrisoner(event.getPlayer().getUniqueId()).addTime(add);
 
                             String msg = "";
-                            if(add == 0L) {
+                            if (add == 0L) {
                                 //Generate the protection message, provide the method with one argument
                                 //which is the thing we are protecting against
                                 msg = Lang.PROTECTIONMESSAGENOPENALTY.get(Lang.INTERACTIONBLOCKS);
-                            }else {
+                            } else {
                                 //Generate the protection message, provide the method with two arguments
                                 //First is the time in minutes and second is the thing we are protecting against
-                                msg = Lang.PROTECTIONMESSAGE.get(new String[] { String.valueOf(TimeUnit.MINUTES.convert(add, TimeUnit.MILLISECONDS)), Lang.INTERACTIONBLOCKS.get() });
+                                msg = Lang.PROTECTIONMESSAGE.get(new String[]{String.valueOf(TimeUnit.MINUTES.convert(add, TimeUnit.MILLISECONDS)), Lang.INTERACTIONBLOCKS.get()});
                             }
 
                             //Send the message
                             event.getPlayer().sendMessage(msg);
-                        }catch(Exception e) {
+                        } catch (Exception e) {
                             pl.getLogger().severe("Prevent Interaction with Blocks penalty's time is in the wrong format, please fix.");
                         }
 
                         event.setCancelled(true);
                     }
-                }else if (event.getPlayer().getInventory().getItemInMainHand() != null) {
+                } else if (event.getPlayer().getInventory().getItemInMainHand() != null) {
                     //Otherwise let's check if they have something in hand
                     //Get the interaction blacklist, check if the current item is in there
                     //if it is, then let's take action
-                    if(Util.isStringInsideList(event.getClickedBlock().getType().toString().toLowerCase(),
+                    if (Util.isStringInsideList(event.getClickedBlock().getType().toString().toLowerCase(),
                             pl.getConfig().getStringList(Settings.PREVENTINTERACTIONITEMS.getPath()))) {
                         try {
                             long add = Util.getTime(pl.getConfig().getString(Settings.PREVENTINTERACTIONITEMSPENALTY.getPath()));
                             pl.getJailManager().getPrisoner(event.getPlayer().getUniqueId()).addTime(add);
 
                             String msg = "";
-                            if(add == 0L) {
+                            if (add == 0L) {
                                 //Generate the protection message, provide the method with one argument
                                 //which is the thing we are protecting against
                                 msg = Lang.PROTECTIONMESSAGENOPENALTY.get(Lang.INTERACTIONITEMS);
-                            }else {
+                            } else {
                                 //Generate the protection message, provide the method with two arguments
                                 //First is the time in minutes and second is the thing we are protecting against
-                                msg = Lang.PROTECTIONMESSAGE.get(new String[] { String.valueOf(TimeUnit.MINUTES.convert(add, TimeUnit.MILLISECONDS)), Lang.INTERACTIONITEMS.get() });
+                                msg = Lang.PROTECTIONMESSAGE.get(new String[]{String.valueOf(TimeUnit.MINUTES.convert(add, TimeUnit.MILLISECONDS)), Lang.INTERACTIONITEMS.get()});
                             }
 
                             //Send the message
                             event.getPlayer().sendMessage(msg);
-                        }catch(Exception e) {
+                        } catch (Exception e) {
                             pl.getLogger().severe("Prevent Interaction with Items penalty's time is in the wrong format, please fix.");
                         }
 

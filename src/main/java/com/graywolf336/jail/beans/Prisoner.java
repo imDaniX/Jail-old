@@ -279,7 +279,7 @@ public class Prisoner {
      * @return the new remaining time the prisoner has
      */
     public long subtractTime(long time) {
-        if(this.time != -1L) {
+        if(this.time != -1L && this.time - time > -1L) {
             this.time -= time;
             this.changed = true;
         }

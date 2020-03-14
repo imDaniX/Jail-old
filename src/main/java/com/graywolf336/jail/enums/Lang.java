@@ -69,6 +69,8 @@ public enum Lang {
     PRISONERSTIME("jailing"),
     /** The message sent to the prisoner when they try to do something but it is protected. */
     PROTECTIONMESSAGE("jailing"),
+
+    CHOPLOGSUCCESS("jailing"),
     /** The message sent to the prisoner when they try to do something and it is protected, but no penalty. */
     PROTECTIONMESSAGENOPENALTY("jailing"),
     /** The message sent to the sender when they need to provide a player. */
