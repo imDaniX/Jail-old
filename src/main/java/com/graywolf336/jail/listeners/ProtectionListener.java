@@ -3,6 +3,9 @@ package com.graywolf336.jail.listeners;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -16,6 +19,7 @@ import com.graywolf336.jail.JailMain;
 import com.graywolf336.jail.Util;
 import com.graywolf336.jail.enums.Lang;
 import com.graywolf336.jail.enums.Settings;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class ProtectionListener implements Listener {
     private JailMain pl;
@@ -32,21 +36,31 @@ public class ProtectionListener implements Listener {
             //Let's check if the player is jailed
             if (pl.getJailManager().isPlayerJailed(event.getPlayer().getUniqueId())) {
                 //Get the breaking whitelist, check if the current item is in there
-                boolean didBreakLog = event.getBlock().getType().toString().contains("_LOG");
+                Block brokenBlock = event.getBlock();
+                boolean didBreakLog = brokenBlock.getType().toString().contains("_LOG");
                 // TODO: Add option to enable in config
                 if (didBreakLog) {
+                    Material blockUnderLog = event.getBlock().getRelative(BlockFace.DOWN).getType();
+
                     String msg = "";
 
                     try {
                         long subtract = Util.getTime(pl.getConfig().getString(Settings.BLOCKBREAKLOGTIMEREDUCTION.getPath()));
                         pl.getJailManager().getPrisoner(event.getPlayer().getUniqueId()).subtractTime(subtract);
 
-                        msg = Lang.CHOPLOGSUCCESS.get(String.valueOf(TimeUnit.MINUTES.convert(subtract, TimeUnit.MILLISECONDS)), Lang.CHOPLOGSUCCESS.get());
+                        msg = Lang.CHOPLOGSUCCESS.get(String.valueOf(TimeUnit.SECONDS.convert(subtract, TimeUnit.MILLISECONDS)), Lang.CHOPLOGSUCCESS.get());
+
+                        if(blockUnderLog == Material.DIRT || blockUnderLog == Material.GRASS_BLOCK || blockUnderLog == Material.COARSE_DIRT){
+                            brokenBlock.setType(Material.OAK_SAPLING);
+                            didBreakLog = false;
+                        }
 
                         event.getPlayer().sendMessage(msg);
                     } catch (Exception err) {
                         pl.getLogger().severe("Block break penalty's time is in the wrong format, please fix.");
                     }
+
+                    event.setCancelled(!didBreakLog);
 
                 } else if (!Util.isStringInsideList(event.getBlock().getType().toString().toLowerCase(),
                         pl.getConfig().getStringList(Settings.BLOCKBREAKWHITELIST.getPath()))) {
@@ -66,7 +80,7 @@ public class ProtectionListener implements Listener {
                         } else {
                             //Generate the protection message, provide the method with two arguments
                             //First is the time in minutes and second is the thing we are protecting against
-                            msg = Lang.PROTECTIONMESSAGE.get(String.valueOf(TimeUnit.MINUTES.convert(add, TimeUnit.MILLISECONDS)), Lang.BLOCKBREAKING.get());
+                            msg = Lang.PROTECTIONMESSAGE.get(String.valueOf(TimeUnit.SECONDS.convert(add, TimeUnit.MILLISECONDS)), Lang.BLOCKBREAKING.get());
                         }
 
                         //Send the message
@@ -76,7 +90,7 @@ public class ProtectionListener implements Listener {
                     }
 
                     //Stop the event from happening, as the block wasn't in the whitelist
-                    event.setCancelled(!didBreakLog);
+                    event.setCancelled(true);
                 }
             } else {
                 //The player is not jailed but they're trying to break blocks inside of the Jail

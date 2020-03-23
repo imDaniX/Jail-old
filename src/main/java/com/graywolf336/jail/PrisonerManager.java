@@ -7,8 +7,10 @@ import java.util.UUID;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import com.graywolf336.jail.beans.AnyCell;
@@ -28,6 +30,7 @@ import com.graywolf336.jail.exceptions.JailRequiredException;
 import com.graywolf336.jail.exceptions.PrisonerAlreadyJailedException;
 import com.graywolf336.jail.exceptions.PrisonerRequiredException;
 import com.graywolf336.jail.interfaces.ICell;
+import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * Provides methods, non-statically, that do the preparing of jails, jailing, etc.
@@ -287,6 +290,19 @@ public class PrisonerManager {
                             }
                             
                             player.getInventory().clear();
+                            ItemStack woodAxe = new ItemStack(Material.WOODEN_AXE);
+                            ItemMeta enchWoodAxe = woodAxe.getItemMeta();
+                            List<String> loreList = new ArrayList<String>();
+                            loreList.add("Work Work Work");
+
+                            enchWoodAxe.setDisplayName("Kramp");
+                            enchWoodAxe.setLore(loreList);
+                            enchWoodAxe.addEnchant(Enchantment.DURABILITY, 1000, true);
+                            enchWoodAxe.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                            woodAxe.setItemMeta(enchWoodAxe);
+
+                            player.getInventory().addItem(woodAxe);
+                            player.updateInventory();
                         }else {
                             for(ItemStack item : player.getInventory().getContents())
                                 if(item != null)
