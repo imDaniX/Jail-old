@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.graywolf336</groupId>
 	<artifactId>Jail</artifactId>
-	<version>3.3.2-SNAPSHOT</version>
+	<version>3.5.0-SNAPSHOT</version>
 	<name>Jail</name>
 	<description>Ban too harsh? Mute too weak? Kicking not enough? Jail them!</description>
 
@@ -35,22 +35,27 @@
 			<id>spigot-repo</id>
 			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
+
+		<repository>
+			<id>papermc</id>
+			<url>https://papermc.io/repo/repository/maven-public/</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
+
 		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-			<version>1.15.1-R0.1-SNAPSHOT</version>
+			<groupId>com.destroystokyo.paper</groupId>
+			<artifactId>paper-api</artifactId>
+			<version>1.16.1-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>craftbukkit</artifactId>
-			<version>1.15.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/spigot-1.15.2.jar</systemPath>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-api</artifactId>
+			<version>1.16.1-R0.1-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>

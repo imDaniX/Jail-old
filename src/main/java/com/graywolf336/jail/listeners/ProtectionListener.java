@@ -2,7 +2,10 @@ package com.graywolf336.jail.listeners;
 
 import java.util.concurrent.TimeUnit;
 
+import org.bukkit.Effect;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -19,7 +22,6 @@ import com.graywolf336.jail.JailMain;
 import com.graywolf336.jail.Util;
 import com.graywolf336.jail.enums.Lang;
 import com.graywolf336.jail.enums.Settings;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class ProtectionListener implements Listener {
     private JailMain pl;
@@ -38,8 +40,16 @@ public class ProtectionListener implements Listener {
                 //Get the breaking whitelist, check if the current item is in there
                 Block brokenBlock = event.getBlock();
                 boolean didBreakLog = brokenBlock.getType().toString().contains("_LOG");
+                boolean didBreakLeaf = brokenBlock.getType().toString().contains("_LEAVES");
+                boolean didBreakSapling = brokenBlock.getType().toString().contains("_SAPLING");
+                World world = brokenBlock.getWorld();
                 // TODO: Add option to enable in config
-                if (didBreakLog) {
+                if(didBreakSapling){
+                    event.setCancelled(true);
+                } else if(didBreakLeaf){
+                    event.setDropItems(false);
+                    event.setCancelled(false);
+                }else if (didBreakLog) {
                     Material blockUnderLog = event.getBlock().getRelative(BlockFace.DOWN).getType();
 
                     String msg = "";
@@ -51,6 +61,7 @@ public class ProtectionListener implements Listener {
                         msg = Lang.CHOPLOGSUCCESS.get(String.valueOf(TimeUnit.SECONDS.convert(subtract, TimeUnit.MILLISECONDS)), Lang.CHOPLOGSUCCESS.get());
 
                         if(blockUnderLog == Material.DIRT || blockUnderLog == Material.GRASS_BLOCK || blockUnderLog == Material.COARSE_DIRT){
+                            world.playEffect(brokenBlock.getLocation(), Effect.STEP_SOUND, Material.OAK_LOG);
                             brokenBlock.setType(Material.OAK_SAPLING);
                             didBreakLog = false;
                         }
@@ -60,6 +71,7 @@ public class ProtectionListener implements Listener {
                         pl.getLogger().severe("Block break penalty's time is in the wrong format, please fix.");
                     }
 
+                    event.setDropItems(false);
                     event.setCancelled(!didBreakLog);
 
                 } else if (!Util.isStringInsideList(event.getBlock().getType().toString().toLowerCase(),

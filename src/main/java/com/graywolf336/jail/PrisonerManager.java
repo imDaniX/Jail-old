@@ -1,9 +1,12 @@
 package com.graywolf336.jail;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import com.destroystokyo.paper.Namespaced;
+import com.destroystokyo.paper.NamespacedTag;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -261,6 +264,8 @@ public class PrisonerManager {
             //Teleport them to the cell's teleport location
             //they will now be placed in jail.
             pl.debug("Teleporting " + player.getName() + " to " + jail.getName() + " in the cell " + cell.getName() + "'s in: " + jail.getTeleportIn().toString());
+            // NEEDS TESTING WITH MULTIPLE WORLDS + INVENTORIES
+            player.teleport(jail.getTeleportIn());
             player.teleport(cell.getTeleport());
             
             //check if we store the inventory
@@ -294,11 +299,19 @@ public class PrisonerManager {
                             ItemMeta enchWoodAxe = woodAxe.getItemMeta();
                             List<String> loreList = new ArrayList<String>();
                             loreList.add("Work Work Work");
+                            loreList.add("Uporabi za les in liste");
 
+                            assert enchWoodAxe != null;
                             enchWoodAxe.setDisplayName("Kramp");
                             enchWoodAxe.setLore(loreList);
                             enchWoodAxe.addEnchant(Enchantment.DURABILITY, 1000, true);
                             enchWoodAxe.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+
+                            List<Namespaced> destroyableBlocks = new ArrayList<>();
+                            destroyableBlocks.add(Material.OAK_LOG.getKey());
+                            destroyableBlocks.add(Material.OAK_LEAVES.getKey());
+                            enchWoodAxe.setDestroyableKeys(destroyableBlocks);
+
                             woodAxe.setItemMeta(enchWoodAxe);
 
                             player.getInventory().addItem(woodAxe);
@@ -551,6 +564,8 @@ public class PrisonerManager {
                 //then by all means let's restore it
                 if(pl.getConfig().getBoolean(Settings.RESTOREPREVIOUSGAMEMODE.getPath(), false)) {
                     player.setGameMode(prisoner.getPreviousGameMode());
+                }else{
+                    player.setGameMode(GameMode.SURVIVAL);
                 }
             };
         }, 5);

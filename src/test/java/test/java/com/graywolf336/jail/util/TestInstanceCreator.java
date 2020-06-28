@@ -31,7 +31,7 @@ import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemFactory;
+//import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -54,7 +54,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import com.graywolf336.jail.JailMain;
 import com.graywolf336.jail.beans.Jail;
 
-@PrepareForTest({ CraftItemFactory.class })
+//@PrepareForTest({ CraftItemFactory.class })
 public class TestInstanceCreator {
     private Random r;
     private JailMain main;
@@ -91,7 +91,7 @@ public class TestInstanceCreator {
             Logger.getLogger("Minecraft").setParent(Util.logger);
             when(mockServer.getLogger()).thenReturn(Util.logger);
             when(mockServer.getWorldContainer()).thenReturn(worldsDirectory);
-            when(mockServer.getItemFactory()).thenReturn(CraftItemFactory.instance());
+            //when(mockServer.getItemFactory()).thenReturn(CraftItemFactory.instance());
             when(mockServer.isPrimaryThread()).thenReturn(true);
 
             mockWorld = MockWorldFactory.makeNewMockWorld("world", Environment.NORMAL, WorldType.NORMAL);
