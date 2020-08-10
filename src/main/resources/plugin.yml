@@ -6,7 +6,7 @@ authors: [graywolf336]
 website: dev.bukkit.org/server-mods/jail/
 softdepend: [WorldEdit, Vault, Multiverse-Core]
 load: POSTWORLD
-api-version: 1.15
+api-version: 1.16
 
 commands:
     jail:

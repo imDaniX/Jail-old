@@ -191,7 +191,7 @@ public class JailManager {
      */
     public Jail getJailFromLocation(Location loc) {
         for(Jail j : jails.values()) {
-            if(Util.isInsideAB(loc.toVector(), j.getMinPoint().toVector(), j.getMaxPoint().toVector())) {
+            if(Util.isInsideAB(loc.toVector(), j.getMinPoint().toVector(), j.getMaxPoint().toVector()) && loc.getWorld() == j.getWorld()) {
                 return j;
             }
         }
@@ -207,7 +207,7 @@ public class JailManager {
      */
     public boolean isLocationAJail(Location l) {
         for(Jail j : jails.values()) {
-            if(Util.isInsideAB(l.toVector(), j.getMinPoint().toVector(), j.getMaxPoint().toVector())) {
+            if(Util.isInsideAB(l.toVector(), j.getMinPoint().toVector(), j.getMaxPoint().toVector()) && l.getWorld() == j.getWorld()) {
                 return true;
             }
         }
